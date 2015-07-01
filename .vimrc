@@ -1,14 +1,15 @@
 set nocompatible
 filetype off            " for NeoBundle
- 
+set history=10000
+
 if has('vim_starting')
         set rtp+=$HOME/.vim/bundle/neobundle.vim/
 endif
 call neobundle#begin(expand('~/.vim/bundle'))
 NeoBundleFetch 'Shougo/neobundle.vim'
- 
+
 " ここから NeoBundle でプラグインを設定します
- 
+
 " NeoBundle で管理するプラグインを追加します。
 "NeoBundle 'Shougo/neocomplcache.git'
 "NeoBundle 'Shougo/unite.vim.git'
@@ -37,14 +38,18 @@ NeoBundle 'guns/vim-clojure-static'
 "NeoBundle 'kien/rainbow_parentheses.vim'
 NeoBundle 'tpope/vim-fireplace'
 NeoBundle 'tpope/vim-classpath'
+NeoBundle 'tpope/vim-leiningen'
 
 "paredit
 NeoBundle 'vim-scripts/paredit.vim'
 
+"python
+NeoBundle 'davidhalter/jedi-vim'
+
 "Java vim
 NeoBundle 'vim-scripts/java.vim'
 "javaid
-NeoBundle 'vim-script/javaid.vim'
+NeoBundle 'vim-scripts/javaid.vim'
 "javacompete
 
 NeoBundleLazy 'vim-scripts/javacomplete', {
@@ -63,9 +68,16 @@ NeoBundle 'vim-script/java_getset.vim'
 
 "git
 NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'danarye/vim-merginalu
+NeoBundle 'danarye/vim-merginalu'
+
+"json
+NeoBundle 'elzr/vim-json'
+
+"CtrlP 
+NeoBundle 'kien/ctrlp.vim'
+
 call neobundle#end()
- 
+
 filetype plugin indent on       " restore filetype
 set tabstop=4
 set shiftwidth=4
@@ -88,16 +100,27 @@ endif
 
 syntax enable
 hi PmenuSel cterm=reverse ctermfg=33 ctermbg=222 gui=reverse guifg=#3399ff guibg=#f0e68c
-    
+
+
 "closure setting
 " rainbow_parentheses.vimの括弧の色付けを有効化
 " au VimEnter * RainbowParenthesesToggle
 " au Syntax * RainbowParenthesesLoadRound
 " au Syntax * RainbowParenthesesLoadSquare
    " paredit
-set filetype=scheme 
-        
+set filetype=scheme
+
 " for displaying line number
  set nu
-" for displaying filename 
+" for displaying filename
  set laststatus=2
+
+"NerdTree
+" 隠しファイルをデフォルトで表示させる
+let NERDTreeShowHidden = 1
+
+"CtrlP setting
+let g:ctrlp_use_migemo = 1 
+let g:ctrlp_clear_cache_on_exit = 0   " 終了時キャッシュをクリアしない
+let g:ctrlp_mruf_max            = 500 " MRUの最大記録数
+let g:ctrlp_open_new_file       = 1   " 新規ファイル作成時にタブで開く
