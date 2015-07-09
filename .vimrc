@@ -155,10 +155,10 @@ if !has('gui_running')
   let g:solarized_visibility = 'high'
 endif
 
-if exists('+colorcolumn')
-  autocmd Filetype * set colorcolumn=81
-  autocmd Filetype Scratch set colorcolumn=''
-endif
+" if exists('+colorcolumn')
+  " autocmd Filetype * set colorcolumn=81
+  " autocmd Filetype Scratch set colorcolumn=''
+" endif
 "------------------------------------------------------------------------------
 " Status line
 set laststatus=2    " 常にステータスラインを表示
@@ -218,7 +218,7 @@ augroup cch
   autocmd! cch
   autocmd WinLeave * set nocursorline
   autocmd WinEnter,BufRead * set cursorline
-augroup END
+ augroup END
 "------------------------------------------------------------------------------
 " Indent
 set autoindent
