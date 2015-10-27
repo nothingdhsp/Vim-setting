@@ -47,6 +47,8 @@ NeoBundle 'hail2u/vim-css3-syntax'
 NeoBundle 'digitaltoad/vim-jade'
 NeoBundle 'leafgarland/typescript-vim'
 NeoBundle 'elzr/vim-json'
+NeoBundle 'pangloss/vim-javascript'
+NeoBundle 'mxw/vim-jsx'
 
 NeoBundleLazy 'clausreinke/typescript-tools', {
 \ 'script_type' : 'plugin',
@@ -76,6 +78,7 @@ NeoBundle 'Shougo/vimproc', {
 NeoBundle 'Shougo/neocomplete.vim'
 NeoBundle 'Shougo/neosnippet'
 NeoBundle 'Shougo/neosnippet-snippets'
+NeoBundle 'myhere/vim-nodejs-complete'
 
 NeoBundle 'marijnh/tern_for_vim', {
 \ 'autoload' : { 'filetypes' : 'javascript' },
@@ -86,14 +89,6 @@ NeoBundle 'marijnh/tern_for_vim', {
 \   },
 \ }
 
-NeoBundleLazy 'OmniSharp/omnisharp-vim', {
-\   'autoload': {'filetypes': ['cs']},
-\   'build': {
-\     'windows': 'MSBuild.exe server/OmniSharp.sln /p:Platform="Any CPU"',
-\     'mac': 'xbuild server/OmniSharp.sln',
-\     'unix': 'xbuild server/OmniSharp.sln',
-\   },
-\ }
 NeoBundle 'tokorom/clang_complete'
 NeoBundle 'tokorom/clang_complete-getopts-ios'
 " Source reading
@@ -126,17 +121,22 @@ NeoBundle 'scrooloose/nerdtree'
 
 "git
 NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'danarye/vim-merginalu'
 
 "CtrlP
 NeoBundle 'kien/ctrlp.vim'
 
-"Neo bundle for closure
-NeoBundle 'guns/vim-clojure-static'
+"Neo bundle for clojure
 NeoBundle 'tpope/vim-fireplace'
 NeoBundle 'tpope/vim-classpath'
 NeoBundle 'tpope/vim-leiningen'
 NeoBundle 'vim-scripts/paredit.vim'
+
+
+"sql
+NeoBundle 'git://github.com/vim-scripts/SQLUtilities.git'
+
+"html
+NeoBundle 'mattn/emmet-vim'
 
 call neobundle#end()
 
@@ -420,18 +420,19 @@ inoremap <expr><Space> pumvisible() ? neocomplete#close_popup()."\<Space>" : "\<
 " Enable omni completion.
 autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
 autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType javascript setlocal omnifunc=nodejscomplete#CompleteJS
 autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 autocmd FileType c set omnifunc=ccomplete#Complete
 autocmd FileType cpp set omnifunc=cppcomplete#Complete
 autocmd FileType php set omnifunc=phpcomplete#CompletePHP
 autocmd FileType typescript setlocal omnifunc=TSScompleteFunc
-autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
 autocmd FileType ruby,eruby setlocal omnifunc=rubycomplete#Complete
 autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
 autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
 autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
+autocmd FileType clojure NeoCompleteLock
+autocmd FileType java NeoBundleSource eclim
 
 " Enable heavy omni completion.
 if !exists('g:neocomplete#sources#omni#input_patterns')
@@ -448,6 +449,13 @@ let g:neocomplete#sources#omni#input_patterns.objc = '[^.[:digit:] *\t]\%(\.\|->
 let g:neocomplete#sources#omni#input_patterns.objcpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
 let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'"
 
+if !exists('g:neocomplcache_omni_functions')
+    let g:neocomplcache_omni_functions = {}
+  endif
+  let g:neocomplcache_omni_functions.javascript = 'nodejscomplete#CompleteJS'
+
+  let g:node_usejscomplete = 1
+
 " For clang_complete
 if !exists('g:neocomplete#force_omni_input_patterns')
   let g:neocomplete#force_omni_input_patterns = {}
@@ -460,6 +468,10 @@ let g:neocomplete#force_omni_input_patterns.objcpp = '[^.[:digit:] *\t]\%(\.\|->
 let g:clang_complete_auto = 0
 let g:clang_auto_select = 0
 "let g:clang_use_library = 1
+"
+"----------------------------------------------------
+"vim-jsx
+let g:jsx_pragma_required = 0
 "------------------------------------------------------------------------------
 " neosnippet
 " Enable snipMate compatibility feature.
@@ -577,7 +589,7 @@ imap <C-b> <C-o><Plug>(poslist-prev-pos)
 let g:syntastic_mode_map = { 'mode': 'active',
   \ 'active_filetypes': [],
   \ 'passive_filetypes': ['html'] }
-let g:syntastic_javascript_checkers = ['jshint']
+let g:syntastic_javascript_checkers = ['jsxhint']
 let g:syntastic_coffee_coffeelint_args = '-f ~/.vim/coffeelint.json'
 " For objective-c
 let g:syntastic_objc_check_header = 1
@@ -593,20 +605,6 @@ let g:quickrun_config = {
 \}
 " quickrun.vim が実行していない場合には <C-c> を呼び出す
 nnoremap <expr><silent> <C-c> quickrun#is_running() ? quickrun#sweep_sessions() : "\<C-c>"
-"------------------------------------------------------------------------------
-" OmniSharp
-let g:OmniSharp_host = "http://localhost:2000"
-let g:OmniSharp_typeLookupInPreview = 1
-
-"Showmatch significantly slows down omnicomplete
-"when the first match contains parentheses.
-set noshowmatch
-
-"don't autoselect first item in omnicomplete, show if only one item (for preview)
-set completeopt=longest,menuone
-
-"Don't ask to save when changing buffers (i.e. when jumping to a type definition)
-set hidden
 "------------------------------------------------------------------------------
 " clang complete
 let g:clang_complete_auto = 0
@@ -628,3 +626,26 @@ let g:vim_json_syntax_conceal = 0
  autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
  let g:NERDTreeDirArrows=0
  let g:NERDTreeMouseMode=0
+ let NERDTreeMapOpenInTab='<ENTER>'
+
+ "sql tool
+vmap <silent>sf        <Plug>SQLU_Formatter<CR>
+nmap <silent>scl       <Plug>SQLU_CreateColumnList<CR>
+nmap <silent>scd       <Plug>SQLU_GetColumnDef<CR>
+nmap <silent>scdt      <Plug>SQLU_GetColumnDataType<CR>
+nmap <silent>scp       <Plug>SQLU_CreateProcedure<CR>
+
+"javascript
+let g:jsx_ext_required = 0
+let g:javascript_enable_domhtmlcss = 1
+
+
+"------------------------------------
+" emmet-vim
+"------------------------------------
+let g:user_emmet_settings = {
+    \    'variables': {
+    \      'lang': "ja"
+    \    },
+    \   'indentation': '  '
+    \ }
