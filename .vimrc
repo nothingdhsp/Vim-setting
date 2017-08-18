@@ -14,12 +14,17 @@ if has("win32") || has("win64")
 else
   let $DOTVIM = expand('~/.vim')
 endif
+
+"for tmux 
+set clipboard=unnamed
+
 "------------------------------------------------------------------------------
 " NeoBundle
 " Plugin 追加: .vimrc に追加して、:NeoBundleInstall
 " Plugin 削除: .vimrc から削除して、:NeoBundleClean
 " Plugin 更新: :NeoBundleUpdate
 filetype off
+
 
 if has('vim_starting')
   set rtp+=$DOTVIM/bundle/neobundle.vim/
@@ -126,6 +131,7 @@ NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'kien/ctrlp.vim'
 
 "Neo bundle for clojure
+NeoBundle "markwoodhall/vim-figwheel"
 NeoBundle 'tpope/vim-fireplace'
 NeoBundle 'tpope/vim-classpath'
 NeoBundle 'tpope/vim-leiningen'
@@ -137,6 +143,9 @@ NeoBundle 'git://github.com/vim-scripts/SQLUtilities.git'
 
 "html
 NeoBundle 'mattn/emmet-vim'
+
+"editor config
+NeoBundle 'editorconfig/editorconfig-vim'
 
 call neobundle#end()
 
@@ -586,10 +595,16 @@ imap <C-b> <C-o><Plug>(poslist-prev-pos)
 " syntastic
 " :Errors エラー一覧表示
 " let g:syntastic_auto_loc_list = 1
+let g:syntastic_enable_signs=1
+let g:syntastic_auto_jump=1
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
 let g:syntastic_mode_map = { 'mode': 'active',
   \ 'active_filetypes': [],
   \ 'passive_filetypes': ['html'] }
 let g:syntastic_javascript_checkers = ['jsxhint']
+let g:syntastic_javascript_jsxhint_exec = 'jsx-jshint-wrapper'
 let g:syntastic_coffee_coffeelint_args = '-f ~/.vim/coffeelint.json'
 " For objective-c
 let g:syntastic_objc_check_header = 1
@@ -649,3 +664,7 @@ let g:user_emmet_settings = {
     \    },
     \   'indentation': '  '
     \ }
+
+"bug
+set maxmempattern=10000
+command! Figwheel :Piggieback! (do (require 'figwheel-sidecar.repl-api) (figwheel-sidecar.repl-api/cljs-repl))

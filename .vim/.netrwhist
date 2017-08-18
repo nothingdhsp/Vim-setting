@@ -1,0 +1,5 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =3
+let g:netrw_dirhist_1='/Users/quokdotri/work/repos/music-chart/docker/selenium'
+let g:netrw_dirhist_2='/Users/quokdotri/work/repos/music-chart/clojure/enjoy-tokyo/src/enjoy_tokyo/controller'
+let g:netrw_dirhist_3='/Users/quokdotri/work/repos/music-chart/clojure/airbnb-scraping'
