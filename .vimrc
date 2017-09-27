@@ -15,8 +15,6 @@ else
   let $DOTVIM = expand('~/.vim')
 endif
 
-"for tmux 
-set clipboard=unnamed
 
 "------------------------------------------------------------------------------
 " NeoBundle
@@ -32,7 +30,7 @@ endif
 
 call neobundle#begin($DOTVIM.'/bundle')
 " NeoBundle
-NeoBundle 'git://github.com/Shougo/neobundle.vim'
+NeoBundle 'https://github.com/Shougo/neobundle.vim'
 
 NeoBundleFetch 'Shougo/neobundle.vim'
 " Color scheme
@@ -101,8 +99,9 @@ NeoBundle 'wesleyche/SrcExpl'
 NeoBundle 'wesleyche/Trinity'
 NeoBundle 'taglist.vim'
 NeoBundle 'scrooloose/nerdtree'
-" Lint
+"EsLint
 NeoBundle 'scrooloose/syntastic'
+NeoBundle 'pmsorhaindo/syntastic-local-eslint.vim'
 " Misc
 " NeoBundle 'fholgado/minibufexpl.vim'
 NeoBundle 'jiangmiao/simple-javascript-indenter'
@@ -120,8 +119,6 @@ NeoBundle 'Align'
 NeoBundle 'thinca/vim-threes'
 NeoBundle 'thinca/vim-singleton'
 
- " ファイルをtree表示してくれる
-NeoBundle 'scrooloose/nerdtree'
 
 
 "git
@@ -131,15 +128,15 @@ NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'kien/ctrlp.vim'
 
 "Neo bundle for clojure
-NeoBundle "markwoodhall/vim-figwheel"
 NeoBundle 'tpope/vim-fireplace'
+NeoBundle "markwoodhall/vim-figwheel"
 NeoBundle 'tpope/vim-classpath'
 NeoBundle 'tpope/vim-leiningen'
 NeoBundle 'vim-scripts/paredit.vim'
 
 
 "sql
-NeoBundle 'git://github.com/vim-scripts/SQLUtilities.git'
+NeoBundle 'https://github.com/vim-scripts/SQLUtilities.git'
 
 "html
 NeoBundle 'mattn/emmet-vim'
@@ -331,7 +328,8 @@ function! s:Normalize()
   set ff=unix
   set fenc=utf-8
   try
-    %s///g
+    %s/
+//g
   catch
   endtry
 endfunction
@@ -600,12 +598,26 @@ let g:syntastic_auto_jump=1
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
-let g:syntastic_mode_map = { 'mode': 'active',
-  \ 'active_filetypes': [],
-  \ 'passive_filetypes': ['html'] }
-let g:syntastic_javascript_checkers = ['jsxhint']
-let g:syntastic_javascript_jsxhint_exec = 'jsx-jshint-wrapper'
-let g:syntastic_coffee_coffeelint_args = '-f ~/.vim/coffeelint.json'
+"let g:syntastic_mode_map = { 'mode': 'active',
+"  \ 'active_filetypes': [],
+"  \ 'passive_filetypes': ['html'] }
+
+let g:syntastic_javascript_checkers=['eslint']
+
+" ここから下は Syntastic のおすすめの設定
+" ref. https://github.com/scrooloose/syntastic#settings
+
+" エラー行に sign を表示
+let g:syntastic_enable_signs = 1
+" location list を常に更新
+let g:syntastic_always_populate_loc_list = 0
+" location list を常に表示
+let g:syntastic_auto_loc_list = 0
+" ファイルを開いた時にチェックを実行する
+let g:syntastic_check_on_open = 1
+" :wq で終了する時もチェックする
+let g:syntastic_check_on_wq = 0
+
 " For objective-c
 let g:syntastic_objc_check_header = 1
 let g:syntastic_objc_auto_refresh_includes = 1
@@ -635,13 +647,19 @@ let g:vim_json_syntax_conceal = 0
 
 " NERDTree
 " " ----------------------------------------
+let g:NERDTreeDirArrows = 1
+let g:NERDTreeDirArrowExpandable = '▸'
+let g:NERDTreeDirArrowCollapsible = '▾'
+let g:NERDTreeGlyphReadOnly = "RO"
+let g:NERDTreeMouseMode=0
+let NERDTreeMapOpenInTab='<ENTER>'
  autocmd FileType nerdtree setlocal nolist       " 不可視文字を非表示
- nnoremap <f2> :NERDTreeToggle<CR>               " <F2>でトグルする
+ autocmd vimenter * NERDTree
+ nnoremap Nt :NERDTreeToggle<CR>               " <F2>でトグルする
 " " 最後に残ったウィンドウがNERDTREEのみのときはvimを閉じる
  autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
- let g:NERDTreeDirArrows=0
- let g:NERDTreeMouseMode=0
- let NERDTreeMapOpenInTab='<ENTER>'
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
 
  "sql tool
 vmap <silent>sf        <Plug>SQLU_Formatter<CR>
